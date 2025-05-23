@@ -26,153 +26,156 @@ import kotlin.random.Random
  */
 @Composable
 fun Portraits(senders: ImmutableList<Sender>, modifier: Modifier = Modifier) {
-  val density = LocalDensity.current
-  val resources = LocalContext.current.resources
+    val density = LocalDensity.current
+    val resources = LocalContext.current.resources
 
-  val portraitDisplayModels = remember(senders, density, resources) {
-      // Pick an index at random to have a "dark avatar", where black is rendered behind the
-      // portrait.
-      val darkAvatarIndex = Random.nextInt(senders.size)
-      senders.shuffled().mapIndexed { index, sender ->
-        sender.getDisplayModel(
-          allowHorizontalOffset = index > 0,
-          darkAvatar = darkAvatarIndex == index,
-          density = density,
-          resources = resources,
-        )
-      }
-  }
-
-  Canvas(
-    modifier = modifier.height(PortraitSize.height),
-  ) {
-    var stride = 0f
-
-    // We need to draw _all_ the black backgrounds first.
-    for (model in portraitDisplayModels) {
-      stride += model.horizontalOffset
-
-      val rotationPivot = Offset(x = PortraitSize.width.toPx(), y = PortraitSize.height.toPx())
-
-      withTransform(
-        transformBlock = {
-          translate(left = stride + model.horizontalOffset, model.verticalOffset)
-          rotate(model.outerRotation, pivot = rotationPivot)
+    val portraitDisplayModels = remember(senders, density, resources) {
+        // Pick an index at random to have a "dark avatar", where black is rendered behind the
+        // portrait.
+        val darkAvatarIndex = Random.nextInt(senders.size)
+        senders.shuffled().mapIndexed { index, sender ->
+            sender.getDisplayModel(
+                allowHorizontalOffset = index > 0,
+                darkAvatar = darkAvatarIndex == index,
+                density = density,
+                resources = resources,
+            )
         }
-      ) {
-        drawRect(Color.Black, size = PortraitSize.toSize())
-      }
-
-      stride += PortraitSize.width.toPx()
     }
 
-    stride = 0f
+    Canvas(
+        modifier = modifier.height(PortraitSize.height),
+    ) {
+        var stride = 0f
 
-    // Then draw the white part of the background in a separate loop, since these can overlap.
-    for (model in portraitDisplayModels) {
-      stride += model.horizontalOffset
+        // We need to draw _all_ the black backgrounds first.
+        for (model in portraitDisplayModels) {
+            stride += model.horizontalOffset
 
-      val rotationPivot = Offset(x = PortraitSize.width.toPx(), y = PortraitSize.height.toPx())
+            val rotationPivot =
+                Offset(x = PortraitSize.width.toPx(), y = PortraitSize.height.toPx())
 
-      withTransform(
-        transformBlock = {
-          translate(left = stride + model.horizontalOffset, model.verticalOffset)
-          rotate(model.middleRotation, pivot = rotationPivot)
+            withTransform(
+                transformBlock = {
+                    translate(left = stride + model.horizontalOffset, model.verticalOffset)
+                    rotate(model.outerRotation, pivot = rotationPivot)
+                }
+            ) {
+                drawRect(Color.Black, size = PortraitSize.toSize())
+            }
+
+            stride += PortraitSize.width.toPx()
         }
-      ) {
-        drawPath(model.middlePath, Color.White)
 
-        withTransform(
-          transformBlock = {
-            rotate(model.innerRotation, rotationPivot)
-            clipPath(model.innerPath)
-          },
-        ) {
-          if (model.darkAvatar) {
-            drawRect(Color.Black)
-          }
+        stride = 0f
 
-          translate(left = model.imageOffset.x, top = model.imageOffset.y) {
-            drawImage(model.image)
-          }
+        // Then draw the white part of the background in a separate loop, since these can overlap.
+        for (model in portraitDisplayModels) {
+            stride += model.horizontalOffset
+
+            val rotationPivot =
+                Offset(x = PortraitSize.width.toPx(), y = PortraitSize.height.toPx())
+
+            withTransform(
+                transformBlock = {
+                    translate(left = stride + model.horizontalOffset, model.verticalOffset)
+                    rotate(model.middleRotation, pivot = rotationPivot)
+                }
+            ) {
+                drawPath(model.middlePath, Color.White)
+
+                withTransform(
+                    transformBlock = {
+                        rotate(model.innerRotation, rotationPivot)
+                        clipPath(model.innerPath)
+                    },
+                ) {
+                    if (model.darkAvatar) {
+                        drawRect(Color.Black)
+                    }
+
+                    translate(left = model.imageOffset.x, top = model.imageOffset.y) {
+                        drawImage(model.image)
+                        //drawImage(Icons.Default.Person)
+                    }
+                }
+            }
+
+            stride += PortraitSize.width.toPx()
         }
-      }
-
-      stride += PortraitSize.width.toPx()
     }
-  }
 }
 
 private fun Sender.getDisplayModel(
-  allowHorizontalOffset: Boolean,
-  darkAvatar: Boolean,
-  density: Density,
-  resources: Resources,
+    allowHorizontalOffset: Boolean,
+    darkAvatar: Boolean,
+    density: Density,
+    resources: Resources,
 ): PortraitDisplayModel = with(density) {
 
-  fun middleOffset(): Float {
-    return randomPxBetween(6.dp, 7.dp)
-  }
+    fun middleOffset(): Float {
+        return randomPxBetween(6.dp, 7.dp)
+    }
 
-  fun innerOffset(): Float {
-    return randomPxBetween(10.dp, 11.dp)
-  }
+    fun innerOffset(): Float {
+        return randomPxBetween(10.dp, 11.dp)
+    }
 
-  val size = PortraitSize.toSize()
+    val size = PortraitSize.toSize()
 
-  val middlePath = Path().apply {
-    moveTo(middleOffset(), middleOffset())
-    lineTo(size.width - middleOffset(), middleOffset())
-    lineTo(size.width - middleOffset(), size.height - middleOffset())
-    lineTo(middleOffset(), size.height - middleOffset())
-    close()
-  }
+    val middlePath = Path().apply {
+        moveTo(middleOffset(), middleOffset())
+        lineTo(size.width - middleOffset(), middleOffset())
+        lineTo(size.width - middleOffset(), size.height - middleOffset())
+        lineTo(middleOffset(), size.height - middleOffset())
+        close()
+    }
 
-  val innerPath = Path().apply {
-    moveTo(innerOffset(), innerOffset())
-    lineTo(size.width - innerOffset(), innerOffset())
-    lineTo(size.width - innerOffset(), size.height - innerOffset() - 1.dp.toPx())
-    lineTo(innerOffset(), size.height - innerOffset())
-    close()
-  }
+    val innerPath = Path().apply {
+        moveTo(innerOffset(), innerOffset())
+        lineTo(size.width - innerOffset(), innerOffset())
+        lineTo(size.width - innerOffset(), size.height - innerOffset() - 1.dp.toPx())
+        lineTo(innerOffset(), size.height - innerOffset())
+        close()
+    }
 
-  val outerRotation = randomBetween(-12f, 2f)
-  val middleRotation = outerRotation + randomBetween(-2f, 0f)
-  val innerRotation = randomBetween(-2f, 0f)
+    val outerRotation = randomBetween(-12f, 2f)
+    val middleRotation = outerRotation + randomBetween(-2f, 0f)
+    val innerRotation = randomBetween(-2f, 0f)
 
-  return PortraitDisplayModel(
-    image = ImageBitmap.imageResource(resources, image),
-    imageOffset = Offset(
-      // Ann's portrait is kind of annoying and looks a bit better when offset to the right.
-      x = if (this@getDisplayModel == Sender.Ann) 8.dp.toPx() else 0f,
-      y = 10.dp.toPx(),
-    ),
-    outerRotation = outerRotation,
-    middleRotation = middleRotation,
-    innerRotation = innerRotation,
-    horizontalOffset = if (allowHorizontalOffset) {
-      randomBetween((-14).dp.toPx(), (-12).dp.toPx())
-    } else {
-      0f
-    },
-    verticalOffset = randomBetween((-4).dp.toPx(), 4.dp.toPx()),
-    middlePath = middlePath,
-    innerPath = innerPath,
-    darkAvatar = darkAvatar,
-  )
+    return PortraitDisplayModel(
+        image = ImageBitmap.imageResource(resources, image),
+        imageOffset = Offset(
+            // Ann's portrait is kind of annoying and looks a bit better when offset to the right.
+            x = if (this@getDisplayModel == Sender.Ann) 8.dp.toPx() else 0f,
+            y = 10.dp.toPx(),
+        ),
+        outerRotation = outerRotation,
+        middleRotation = middleRotation,
+        innerRotation = innerRotation,
+        horizontalOffset = if (allowHorizontalOffset) {
+            randomBetween((-14).dp.toPx(), (-12).dp.toPx())
+        } else {
+            0f
+        },
+        verticalOffset = randomBetween((-4).dp.toPx(), 4.dp.toPx()),
+        middlePath = middlePath,
+        innerPath = innerPath,
+        darkAvatar = darkAvatar,
+    )
 }
 
 private val PortraitSize = DpSize(width = 70.dp, height = 80.dp)
 
 private data class PortraitDisplayModel(
-  val image: ImageBitmap,
-  val imageOffset: Offset,
-  val outerRotation: Float,
-  val middleRotation: Float,
-  val innerRotation: Float,
-  val horizontalOffset: Float,
-  val verticalOffset: Float,
-  val middlePath: Path,
-  val innerPath: Path,
-  val darkAvatar: Boolean,
+    val image: ImageBitmap,
+    val imageOffset: Offset,
+    val outerRotation: Float,
+    val middleRotation: Float,
+    val innerRotation: Float,
+    val horizontalOffset: Float,
+    val verticalOffset: Float,
+    val middlePath: Path,
+    val innerPath: Path,
+    val darkAvatar: Boolean,
 )

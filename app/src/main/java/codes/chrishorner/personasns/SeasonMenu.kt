@@ -20,7 +20,6 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawOutline
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
@@ -31,96 +30,96 @@ import androidx.compose.ui.window.Popup
  */
 @Composable
 fun SeasonMenu(
-  hostElement: @Composable () -> Unit,
-  onSeasonChange: (Season) -> Unit,
-  modifier: Modifier = Modifier,
+    hostElement: @Composable () -> Unit,
+    onSeasonChange: (Season) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-  var showPopup by remember { mutableStateOf(false) }
-  val interaction = remember { MutableInteractionSource() }
-  val pressed by interaction.collectIsPressedAsState()
-  val scale by animateFloatAsState(targetValue = if (pressed) 0.90f else 1f, label = "scale")
+    var showPopup by remember { mutableStateOf(false) }
+    val interaction = remember { MutableInteractionSource() }
+    val pressed by interaction.collectIsPressedAsState()
+    val scale by animateFloatAsState(targetValue = if (pressed) 0.90f else 1f, label = "scale")
 
-  Box(
-    contentAlignment = Alignment.TopEnd,
-    modifier = modifier,
-  ) {
     Box(
-      modifier = Modifier
-        .scale(scale)
-        .clickable(
-          interactionSource = interaction,
-          indication = null,
-          onClick = { showPopup = true },
-        ),
+        contentAlignment = Alignment.TopEnd,
+        modifier = modifier,
     ) {
-      hostElement()
-    }
+        Box(
+            modifier = Modifier
+                .scale(scale)
+                .clickable(
+                    interactionSource = interaction,
+                    indication = null,
+                    onClick = { showPopup = true },
+                ),
+        ) {
+            hostElement()
+        }
 
-    SeasonPopupMenu(
-      show = showPopup,
-      onDismissRequest = { showPopup = false },
-      onSeasonChange = onSeasonChange,
-    )
-  }
+        SeasonPopupMenu(
+            show = showPopup,
+            onDismissRequest = { showPopup = false },
+            onSeasonChange = onSeasonChange,
+        )
+    }
 }
 
 @Composable
 private fun SeasonPopupMenu(
-  show: Boolean,
-  onDismissRequest: () -> Unit,
-  onSeasonChange: (Season) -> Unit,
+    show: Boolean,
+    onDismissRequest: () -> Unit,
+    onSeasonChange: (Season) -> Unit,
 ) {
-  if (!show) return
+    if (!show) return
 
-  Popup(onDismissRequest = onDismissRequest) {
-    Column(
-      modifier = Modifier
-        .menuBackground()
-        .padding(horizontal = 40.dp, vertical = 12.dp)
-    ) {
-      Season.entries.forEach { season ->
-        SeasonOption(
-          season = season,
-          onClick = {
-            onDismissRequest()
-            onSeasonChange(season)
-          },
-        )
-      }
+    Popup(onDismissRequest = onDismissRequest) {
+        Column(
+            modifier = Modifier
+                .menuBackground()
+                .padding(horizontal = 40.dp, vertical = 12.dp)
+        ) {
+            Season.entries.forEach { season ->
+                SeasonOption(
+                    season = season,
+                    onClick = {
+                        onDismissRequest()
+                        onSeasonChange(season)
+                    },
+                )
+            }
+        }
     }
-  }
 }
 
 @Composable
 private fun SeasonOption(season: Season, onClick: () -> Unit) {
-  Text(
-    text = season.name.lowercase().replaceFirstChar { it.uppercaseChar() },
-    fontSize = 30.sp,
-    fontFamily = OptimaNova,
-    color = Color.Black,
-    modifier = Modifier.clickable { onClick() }
-  )
+    Text(
+        text = season.name.lowercase().replaceFirstChar { it.uppercaseChar() },
+        fontSize = 30.sp,
+        fontFamily = OptimaNova,
+        color = Color.Black,
+        modifier = Modifier.clickable { onClick() }
+    )
 }
 
 private fun Modifier.menuBackground(): Modifier {
-  return this.drawBehind {
-    val outerBox = GenericShape { size, _ ->
-      moveTo(0f, 0f)
-      lineTo(size.width - 35.dp.toPx(), 4.dp.toPx())
-      lineTo(size.width - 10.7.dp.toPx(), size.height - 6.6.dp.toPx())
-      lineTo(35.5.dp.toPx(), size.height)
-      close()
-    }
+    return this.drawBehind {
+        val outerBox = GenericShape { size, _ ->
+            moveTo(0f, 0f)
+            lineTo(size.width - 35.dp.toPx(), 4.dp.toPx())
+            lineTo(size.width - 10.7.dp.toPx(), size.height - 6.6.dp.toPx())
+            lineTo(35.5.dp.toPx(), size.height)
+            close()
+        }
 
-    val innerBox = GenericShape { size, _ ->
-      moveTo(12.dp.toPx(), 5.dp.toPx())
-      lineTo(size.width - 36.dp.toPx(), 9.5.dp.toPx())
-      lineTo(size.width - 16.4.dp.toPx(), size.height - 11.7.dp.toPx())
-      lineTo(36.5.dp.toPx(), size.height - 3.5.dp.toPx())
-      close()
-    }
+        val innerBox = GenericShape { size, _ ->
+            moveTo(12.dp.toPx(), 5.dp.toPx())
+            lineTo(size.width - 36.dp.toPx(), 9.5.dp.toPx())
+            lineTo(size.width - 16.4.dp.toPx(), size.height - 11.7.dp.toPx())
+            lineTo(36.5.dp.toPx(), size.height - 3.5.dp.toPx())
+            close()
+        }
 
-    drawOutline(Outline(outerBox), Color.Black)
-    drawOutline(Outline(innerBox), Color.White)
-  }
+        drawOutline(Outline(outerBox), Color.Black)
+        drawOutline(Outline(innerBox), Color.White)
+    }
 }

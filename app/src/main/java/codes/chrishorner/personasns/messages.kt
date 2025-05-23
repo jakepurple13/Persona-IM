@@ -1,6 +1,7 @@
 package codes.chrishorner.personasns
 
 import androidx.annotation.DrawableRes
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.graphics.Color
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -27,14 +28,21 @@ enum class Sender(@DrawableRes val image: Int, val color: Color) {
 class MessagesState {
   private var count = 0
 
-  fun advance(): ImmutableList<Message> {
-    count++
+  val messageList = mutableStateListOf<Message>()
+
+  fun advance(
+    text: String = "",
+  ): ImmutableList<Message> {
+    if (text.isEmpty()) count++
 
     if (count > Messages.size) {
       count = 1
+      messageList.clear()
+    } else {
+      messageList.add(if (text.isNotEmpty()) Message(Sender.Ren, text) else Messages[count - 1])
     }
 
-    return Messages.take(count).toImmutableList()
+    return messageList.toImmutableList()//Messages.take(count).toImmutableList()
   }
 }
 

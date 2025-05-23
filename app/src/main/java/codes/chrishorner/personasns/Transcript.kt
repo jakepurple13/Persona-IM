@@ -25,50 +25,51 @@ import kotlinx.collections.immutable.ImmutableList
  */
 @Composable
 fun Transcript(entries: ImmutableList<Entry>) {
-  val listState = rememberLazyListState()
-  val totalItemCount by remember { derivedStateOf { listState.layoutInfo.totalItemsCount } }
+    val listState = rememberLazyListState()
+    val totalItemCount by remember { derivedStateOf { listState.layoutInfo.totalItemsCount } }
 
-  LaunchedEffect(totalItemCount) {
-    val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull() ?: return@LaunchedEffect
-    // animateScrollToItem isn't super smooth, so if the newly added item is visible, then animate
-    // manually with a tween.
-    if (lastVisibleItem.index == totalItemCount - 1) {
-      listState.animateScrollBy(
-        value = lastVisibleItem.size.toFloat() + listState.layoutInfo.afterContentPadding,
-        animationSpec = tween(durationMillis = 280),
-      )
-    } else {
-      listState.animateScrollToItem(totalItemCount - 1)
-    }
-  }
-
-  LazyColumn(
-    verticalArrangement = Arrangement.spacedBy(TranscriptSizes.EntrySpacing),
-    state = listState,
-    contentPadding = WindowInsets.systemBars
-      .add(WindowInsets(top = 100.dp, bottom = 100.dp))
-      .asPaddingValues(),
-    modifier = Modifier.fillMaxSize()
-  ) {
-    itemsIndexed(
-      items = entries,
-      key = { _, entry -> entry.message.text },
-    ) { index, entry ->
-      if (entry.message.sender == Sender.Ren) {
-        Reply(
-          entry = entry,
-          modifier = Modifier.drawConnectingLine(entry, entries.getOrNull(index + 1))
-        )
-      } else {
-        Entry(
-          entry,
-          modifier = Modifier.drawConnectingLine(entry, entries.getOrNull(index + 1))
-        )
-      }
+    LaunchedEffect(totalItemCount) {
+        val lastVisibleItem =
+            listState.layoutInfo.visibleItemsInfo.lastOrNull() ?: return@LaunchedEffect
+        // animateScrollToItem isn't super smooth, so if the newly added item is visible, then animate
+        // manually with a tween.
+        if (lastVisibleItem.index == totalItemCount - 1) {
+            listState.animateScrollBy(
+                value = lastVisibleItem.size.toFloat() + listState.layoutInfo.afterContentPadding,
+                animationSpec = tween(durationMillis = 280),
+            )
+        } else {
+            listState.animateScrollToItem(totalItemCount - 1)
+        }
     }
 
-    item {
-      TypingIndicator()
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(TranscriptSizes.EntrySpacing),
+        state = listState,
+        contentPadding = WindowInsets.systemBars
+            .add(WindowInsets(top = 100.dp, bottom = 100.dp))
+            .asPaddingValues(),
+        modifier = Modifier.fillMaxSize()
+    ) {
+        itemsIndexed(
+            items = entries,
+            //key = { _, entry -> entry.message.text },
+        ) { index, entry ->
+            if (entry.message.sender == Sender.Ren) {
+                Reply(
+                    entry = entry,
+                    modifier = Modifier.drawConnectingLine(entry, entries.getOrNull(index + 1))
+                )
+            } else {
+                Entry(
+                    entry,
+                    modifier = Modifier.drawConnectingLine(entry, entries.getOrNull(index + 1))
+                )
+            }
+        }
+
+        item {
+            TypingIndicator()
+        }
     }
-  }
 }
