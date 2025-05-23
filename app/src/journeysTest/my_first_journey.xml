@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?><!-- @formatter:off -->
+<journey name="My first Journey">
+    <description>A Journey that tests ...</description>
+    <actions>
+        <action>tap on the next button and make sure a message is shown</action><action>Write a message and send it and make sure it's shown</action><action>Press on the IM button and change the season to spring</action>
+    </actions>
+</journey>

@@ -42,7 +42,7 @@ class MessagesState {
                 Messages[count % Messages.size]
         )
 
-        return messageList.toImmutableList()//Messages.take(count).toImmutableList()
+        return messageList.toImmutableList()
     }
 }
 

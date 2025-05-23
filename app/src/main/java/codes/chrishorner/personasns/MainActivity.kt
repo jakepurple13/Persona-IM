@@ -137,17 +137,6 @@ private fun NextButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun RootContainer(content: @Composable () -> Unit) {
-    /*val view = LocalView.current
-    val window = (view.context as Activity).window
-    SideEffect {
-        window.statusBarColor = Color.Black.copy(alpha = 0.3f).toArgb()
-        window.navigationBarColor = Color.Transparent.toArgb()
-    }*/
-    content()
-}
-
-@Composable
 fun MessageInput(
     onSendMessage: (String) -> Unit,
     enabled: Boolean,
@@ -155,6 +144,13 @@ fun MessageInput(
 ) {
     val keyboard = LocalSoftwareKeyboardController.current
     var userMessage by rememberSaveable { mutableStateOf("") }
+
+    // Extract the send message action to avoid duplication
+    val sendMessage: () -> Unit = {
+        onSendMessage(userMessage)
+        userMessage = ""
+        keyboard?.hide()
+    }
 
     ElevatedCard(
         shape = RoundedCornerShape(
@@ -204,19 +200,11 @@ fun MessageInput(
                 unfocusedLabelColor = Color.White,
             ),
             keyboardActions = KeyboardActions(
-                onSend = {
-                    onSendMessage(userMessage)
-                    userMessage = ""
-                    keyboard?.hide()
-                }
+                onSend = { sendMessage() }
             ),
             trailingIcon = {
                 NextButton(
-                    onClick = {
-                        onSendMessage(userMessage)
-                        userMessage = ""
-                        keyboard?.hide()
-                    },
+                    onClick = sendMessage,
                     modifier = Modifier.padding(16.dp)
                 )
             },
