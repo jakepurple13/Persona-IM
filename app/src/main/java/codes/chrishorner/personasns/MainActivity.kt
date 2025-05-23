@@ -39,7 +39,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -66,15 +65,14 @@ class MainActivity : ComponentActivity() {
                         onSendMessage = { transcriptState.advance(it) },
                         enabled = true,
                         modifier = Modifier
-                            .background(PersonaRed.compositeOver(Color.Black))
+                            .background(PersonaRed)
                             .navigationBarsPadding()
                     )
-                }
+                },
+                containerColor = PersonaRed
             ) { padding ->
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(color = PersonaRed)
+                    modifier = Modifier.fillMaxSize()
                 ) {
                     Crossfade(season) { target ->
                         BackgroundParticles(target)
