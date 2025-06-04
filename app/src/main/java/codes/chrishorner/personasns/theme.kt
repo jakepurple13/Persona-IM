@@ -10,3 +10,4 @@ val OptimaNova = FontFamily(
 )
 
 val PersonaRed = Color(0xFFC41001)
+val PersonaBlue = Color(0xFF0110C4)

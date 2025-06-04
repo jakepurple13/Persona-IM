@@ -95,6 +95,7 @@ fun Portraits(senders: ImmutableList<Sender>, modifier: Modifier = Modifier) {
                     }
 
                     translate(left = model.imageOffset.x, top = model.imageOffset.y) {
+                        //TODO: Would need to do image loading
                         drawImage(model.image)
                         //drawImage(Icons.Default.Person)
                     }

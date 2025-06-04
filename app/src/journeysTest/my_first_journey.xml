@@ -2,6 +2,6 @@
 <journey name="My first Journey">
     <description>A Journey that tests ...</description>
     <actions>
-        <action>tap on the next button and make sure a message is shown</action><action>Write a message and send it and make sure it's shown</action><action>Press on the IM button and change the season to spring</action>
+        <action>tap on the next button 2 times and make sure a message is shown</action><action>Write a message and send it and make sure it's shown</action><action>Press on the IM button and change the season to spring</action><action>Write a message asking for potatoes and send it</action>
     </actions>
 </journey>
